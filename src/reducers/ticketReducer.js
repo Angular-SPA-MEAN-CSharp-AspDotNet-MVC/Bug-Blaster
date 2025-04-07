@@ -1,3 +1,5 @@
+import { editableInputTypes } from "@testing-library/user-event/dist/utils";
+
 export default function ticketReducer(state, action) {
   switch (action.type) {
     case "ADD_TICKET":
@@ -8,6 +10,7 @@ export default function ticketReducer(state, action) {
         ticket: state.tickets.map((ticket) =>
           ticket.id === action.payload.id ? action.payload : ticket
         ),
+        editingTicket: null,
       };
     case "SET_EDITING_TICKET":
       return {
@@ -20,11 +23,26 @@ export default function ticketReducer(state, action) {
         editingTicket: null,
       };
     case "DELETE_TICKET":
+      if (state.editingTicket && action.payload.id === state.editingTicket.id) {
+        return {
+          ...state,
+          tickets: state.tickets.filter(
+            (ticket) => ticket.id !== action.payload.id
+          ),
+          editingTicket: null,
+        };
+      } else {
+        return {
+          ...state,
+          tickets: state.tickets.filter(
+            (ticket) => ticket.id !== action.payload.id
+          ),
+        };
+      }
+    case "SET_SORTING":
       return {
         ...state,
-        tickets: state.tickets.filter(
-          (ticket) => ticket.id !== action.payload.id
-        ),
+        sortPreference: action.payload,
       };
     default:
       return state;
